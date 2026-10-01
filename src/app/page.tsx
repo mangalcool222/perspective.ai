@@ -11,7 +11,7 @@ import { PerspectiveBriefView } from '@/components/PerspectiveBriefView';
 import { LiveRoomChat } from '@/components/LiveRoomChat';
 import { HistoryDrawer } from '@/components/HistoryDrawer';
 import { PerspectiveBrief, PresetExample, RoomMode, RoomChatMessage } from '@/types/perspective';
-import { Sparkles, ArrowRight, FileText, Users, MessageSquare, Share2, Check } from 'lucide-react';
+import { Sparkles, ArrowRight, FileText, Users, MessageSquare, Share2, Check, Zap, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 function HomePageContent() {
@@ -197,7 +197,12 @@ function HomePageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-neutral-900 font-sans selection:bg-neutral-900 selection:text-white">
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-purple-500 selection:text-white relative overflow-hidden bg-grid-pattern">
+      {/* Ambient Glowing Orbs Background */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-900/20 blur-[120px] pointer-events-none animate-pulse-slow" />
+      <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-cyan-950/30 blur-[140px] pointer-events-none animate-pulse-slow" />
+      <div className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-indigo-950/30 blur-[130px] pointer-events-none animate-pulse-slow" />
+
       {/* Top Header */}
       <Header
         historyCount={history.length}
@@ -206,33 +211,33 @@ function HomePageContent() {
       />
 
       {/* Main Container */}
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-12 space-y-8">
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-12 space-y-8 relative z-10">
         {!currentBrief && !isLoading && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             className="mx-auto max-w-3xl space-y-8 text-center"
           >
             {/* Hero Headline */}
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600 shadow-2xs">
-                <Sparkles className="h-3.5 w-3.5 text-neutral-800" />
-                <span>Perspective.ai — Dialectic Decision Environment</span>
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/60 px-4 py-1.5 text-xs font-mono font-medium text-purple-300 shadow-lg backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
+                <span>Perspective.ai — Dialectic AI Executive War Room</span>
               </div>
-              <h1 className="font-serif text-3xl font-medium tracking-tight text-neutral-900 sm:text-5xl leading-tight">
+              <h1 className="font-sans font-extrabold text-4xl sm:text-6xl tracking-tight text-white leading-[1.1]">
                 Don&apos;t get answers. <br />
-                <span className="text-neutral-400 italic font-serif">Find your blindspots.</span>
+                <span className="text-hologram">Find your blindspots.</span>
               </h1>
-              <p className="mx-auto max-w-xl text-xs sm:text-sm text-neutral-500 leading-relaxed">
-                Assemble an automated room of 4 AI advisors — <strong>Strategist 🧠</strong>, <strong>Skeptic 🔴</strong>, <strong>Customer 👤</strong>, and <strong>Operator ⚙️</strong> — to challenge your assumptions before you execute.
+              <p className="mx-auto max-w-xl text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans">
+                Assemble an automated board of 4 AI advisors — <strong className="text-cyan-300">Strategist 🧠</strong>, <strong className="text-red-400">Skeptic 🔴</strong>, <strong className="text-emerald-400">Customer 👤</strong>, and <strong className="text-amber-400">Operator ⚙️</strong> — to pressure-test your strategy before execution.
               </p>
             </div>
 
             {/* Input Card */}
-            <div className="rounded-2xl border border-neutral-200/90 bg-white p-5 sm:p-6 shadow-xs text-left space-y-5">
-              <div className="space-y-2">
-                <label htmlFor="problem-input" className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 font-mono">
-                  What decision or strategy are you trying to figure out?
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5 sm:p-7 shadow-2xl backdrop-blur-xl text-left space-y-6">
+              <div className="space-y-2.5">
+                <label htmlFor="problem-input" className="block text-xs font-mono font-bold uppercase tracking-wider text-purple-300 flex items-center gap-2">
+                  <Zap className="h-3.5 w-3.5 text-cyan-400" /> WHAT DECISION OR STRATEGY ARE YOU TRYING TO FIGURE OUT?
                 </label>
                 <textarea
                   id="problem-input"
@@ -240,10 +245,10 @@ function HomePageContent() {
                   value={problem}
                   onChange={(e) => setProblem(e.target.value)}
                   placeholder="e.g. Should I launch UGhar with 3 services (AC, Plumbing, Cleaning) or start with AC repair only?"
-                  className="w-full rounded-xl border border-neutral-200 bg-neutral-50/50 p-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-neutral-900 transition-all resize-none"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900/90 p-4 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-purple-500 focus:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-purple-500/30 transition-all resize-none font-sans"
                 />
                 {errorMessage && (
-                  <p className="text-xs font-medium text-red-600">{errorMessage}</p>
+                  <p className="text-xs font-semibold text-red-400">{errorMessage}</p>
                 )}
               </div>
 
@@ -251,9 +256,9 @@ function HomePageContent() {
               <PresetExamples onSelect={handleSelectPreset} />
 
               {/* Room Mode Selector */}
-              <div className="space-y-2 pt-2 border-t border-neutral-100">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 font-mono">
-                  Select Room Mode
+              <div className="space-y-2.5 pt-3 border-t border-zinc-800/80">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">
+                  Select Advisory Room Mode
                 </label>
                 <RoomModeSelector
                   selectedMode={selectedMode}
@@ -264,9 +269,9 @@ function HomePageContent() {
               {/* Primary Action Button */}
               <button
                 onClick={handleAssembleRoom}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-900 py-3.5 px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 transition-all cursor-pointer group"
+                className="w-full flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 py-4 px-6 text-sm font-bold text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-cyan-500 transition-all cursor-pointer group border border-purple-400/30"
               >
-                <span>⚡ ASSEMBLE THE ROOM</span>
+                <span>⚡ ASSEMBLE THE WAR ROOM</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
@@ -292,44 +297,44 @@ function HomePageContent() {
             className="space-y-6"
           >
             {/* Tab Bar & Share Action Toggle */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-neutral-200 pb-3">
-              <div className="flex flex-wrap items-center gap-1 rounded-xl bg-neutral-200/60 p-1 border border-neutral-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+              <div className="flex flex-wrap items-center gap-1.5 rounded-xl bg-zinc-950 p-1.5 border border-zinc-800 backdrop-blur-xl">
                 <button
                   onClick={() => setActiveTab('brief')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold font-mono transition-all cursor-pointer ${
                     activeTab === 'brief'
-                      ? 'bg-white text-neutral-900 shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-purple-400/30'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
                   }`}
                 >
-                  <FileText className="h-3.5 w-3.5 text-neutral-700" />
+                  <FileText className="h-3.5 w-3.5 text-cyan-400" />
                   <span>📋 Decision Brief</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('chat')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold font-mono transition-all cursor-pointer ${
                     activeTab === 'chat'
-                      ? 'bg-white text-neutral-900 shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-purple-400/30'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
                   }`}
                 >
-                  <MessageSquare className="h-3.5 w-3.5 text-neutral-700" />
+                  <MessageSquare className="h-3.5 w-3.5 text-cyan-400" />
                   <span>💬 Live Room Discussion (@Mentions)</span>
                   {chatHistory.length > 0 && (
-                    <span className="rounded-full bg-neutral-900 px-1.5 py-0.2 text-[9px] text-white font-mono font-semibold">
+                    <span className="rounded-full bg-cyan-400 px-1.5 py-0.2 text-[9px] text-zinc-950 font-mono font-bold">
                       {chatHistory.length}
                     </span>
                   )}
                 </button>
                 <button
                   onClick={() => setActiveTab('personas')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold font-mono transition-all cursor-pointer ${
                     activeTab === 'personas'
-                      ? 'bg-white text-neutral-900 shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-purple-400/30'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
                   }`}
                 >
-                  <Users className="h-3.5 w-3.5 text-neutral-700" />
+                  <Users className="h-3.5 w-3.5 text-cyan-400" />
                   <span>🧠 Persona Room</span>
                 </button>
               </div>
@@ -337,9 +342,9 @@ function HomePageContent() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleShareLink}
-                  className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow-2xs hover:bg-neutral-50 transition-colors"
+                  className="flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/90 px-3.5 py-2 text-xs font-mono font-medium text-zinc-300 shadow-sm hover:border-purple-500/50 hover:bg-zinc-800 hover:text-white transition-all cursor-pointer"
                 >
-                  {linkCopied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Share2 className="h-3.5 w-3.5 text-neutral-500" />}
+                  {linkCopied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Share2 className="h-3.5 w-3.5 text-zinc-400" />}
                   <span>{linkCopied ? 'Share Link Copied!' : 'Share Room Link'}</span>
                 </button>
               </div>
@@ -392,8 +397,9 @@ function HomePageContent() {
 
 export default function HomePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#fafafa]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#09090b]" />}>
       <HomePageContent />
     </Suspense>
   );
 }
+
