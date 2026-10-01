@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PERSONAS } from '@/lib/constants';
 import { PersonaOpinion, PersonaType } from '@/types/perspective';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, Sparkles, UserCheck, Settings, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, Pause, ChevronDown, ChevronUp, MessageSquare, Sparkles } from 'lucide-react';
 
 interface RoomCanvasProps {
   opinions: PersonaOpinion[];
@@ -15,28 +15,73 @@ export const RoomCanvas: React.FC<RoomCanvasProps> = ({
   opinions,
   problemStatement,
 }) => {
-  const [activePersona, setActivePersona] = useState<PersonaType | null>(null);
+  const order: PersonaType[] = ['strategist', 'skeptic', 'customer', 'operator'];
+  const [activePersona, setActivePersona] = useState<PersonaType>(order[0]);
+  const [isPaused, setIsPaused] = useState(false);
+  const [userLocked, setUserLocked] = useState(false);
 
   const personaMap = opinions.reduce<Record<string, PersonaOpinion>>((acc, curr) => {
     acc[curr.persona] = curr;
     return acc;
   }, {});
 
-  const order: PersonaType[] = ['strategist', 'skeptic', 'customer', 'operator'];
+  // Auto slide personas every 3.5s unless user hovered or manually locked
+  useEffect(() => {
+    if (isPaused || userLocked) return;
+
+    const timer = setInterval(() => {
+      setActivePersona((prev) => {
+        const currentIndex = order.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % order.length;
+        return order[nextIndex];
+      });
+    }, 3500);
+
+    return () => clearInterval(timer);
+  }, [isPaused, userLocked]);
+
+  const handleSelectPersona = (key: PersonaType) => {
+    if (activePersona === key && userLocked) {
+      setUserLocked(false);
+    } else {
+      setActivePersona(key);
+      setUserLocked(true);
+    }
+  };
 
   return (
-    <div className="w-full rounded-2xl border border-neutral-200 bg-gradient-to-b from-neutral-50/80 to-white p-4 sm:p-6 shadow-2xs">
-      {/* Header Badge */}
-      <div className="flex items-center justify-between border-b border-neutral-200/60 pb-3 mb-6">
+    <div 
+      className="w-full rounded-2xl border border-neutral-200 bg-white p-5 sm:p-7 shadow-xs space-y-6"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Header Badge & Auto-Slide Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-4">
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 font-mono">
-            The Thinking Room — 4 Persona Panel
+          <div className="h-2 w-2 rounded-full bg-neutral-900 animate-pulse" />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-900 font-mono">
+            The Advisory Board — 4 Persona Panel
           </h3>
         </div>
-        <span className="text-[11px] text-neutral-400">
-          Click any persona to inspect their raw take
-        </span>
+
+        <div className="flex items-center gap-3 text-xs text-neutral-500 font-mono">
+          <button
+            onClick={() => setUserLocked(!userLocked)}
+            className="flex items-center gap-1.5 rounded-lg border border-neutral-200 px-2.5 py-1 hover:bg-neutral-100 transition-colors cursor-pointer text-[11px]"
+          >
+            {userLocked ? (
+              <>
+                <Pause className="h-3 w-3 text-neutral-800" />
+                <span>Auto-Slide Paused (Click to Resume)</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3 w-3 text-emerald-600 animate-pulse" />
+                <span>Auto-Rotating Deck</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Grid of 4 Personas Surround */}
@@ -44,43 +89,57 @@ export const RoomCanvas: React.FC<RoomCanvasProps> = ({
         {order.map((key) => {
           const info = PERSONAS[key];
           const opinion = personaMap[key];
-          const isSelected = activePersona === key;
+          const isActive = activePersona === key;
 
           return (
             <motion.div
               key={key}
               whileHover={{ y: -2 }}
-              onClick={() => setActivePersona(isSelected ? null : key)}
-              className={`cursor-pointer rounded-xl border p-4 transition-all relative ${
-                info.color
-              } ${isSelected ? 'ring-2 ring-neutral-900 shadow-md' : 'shadow-2xs'}`}
+              onClick={() => handleSelectPersona(key)}
+              className={`cursor-pointer rounded-xl border p-4 transition-all relative overflow-hidden ${
+                isActive
+                  ? 'border-neutral-900 bg-neutral-900 text-white shadow-md'
+                  : 'border-neutral-200 bg-neutral-50/50 text-neutral-800 hover:border-neutral-400 hover:bg-white'
+              }`}
             >
+              {/* Progress Line for Active Persona */}
+              {isActive && !userLocked && !isPaused && (
+                <motion.div
+                  initial={{ width: '0%' }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: 3.5, ease: 'linear' }}
+                  className="absolute top-0 left-0 h-1 bg-white/80"
+                />
+              )}
+
               {/* Top Persona Header */}
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <span className="text-2xl">{info.avatar}</span>
                   <div>
-                    <h4 className="text-sm font-semibold text-neutral-900">
+                    <h4 className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-neutral-900'}`}>
                       {info.name}
                     </h4>
-                    <p className="text-[10px] text-neutral-600 font-medium">
+                    <p className={`text-[10px] font-medium ${isActive ? 'text-neutral-300' : 'text-neutral-500'}`}>
                       {info.role}
                     </p>
                   </div>
                 </div>
-                {isSelected ? (
-                  <ChevronUp className="h-4 w-4 text-neutral-700" />
+                {isActive ? (
+                  <ChevronUp className="h-4 w-4 text-white shrink-0" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-neutral-400" />
+                  <ChevronDown className="h-4 w-4 text-neutral-400 shrink-0" />
                 )}
               </div>
 
               {/* Title & Key Snippet */}
-              <div className="mt-3">
-                <p className="text-xs font-medium text-neutral-900 leading-snug line-clamp-2">
+              <div className="mt-3.5">
+                <p className={`text-xs font-medium leading-snug line-clamp-2 ${isActive ? 'text-neutral-100' : 'text-neutral-900'}`}>
                   {opinion ? opinion.title : info.description}
                 </p>
-                <div className="mt-2.5 flex items-center justify-between border-t border-neutral-200/60 pt-2 text-[11px] font-medium text-neutral-600 font-mono">
+                <div className={`mt-3 flex items-center justify-between border-t pt-2 text-[11px] font-mono ${
+                  isActive ? 'border-neutral-800 text-neutral-400' : 'border-neutral-200/80 text-neutral-500'
+                }`}>
                   <span className="truncate max-w-[180px]">
                     {opinion ? `Key: ${opinion.keyConcern}` : info.badge}
                   </span>
@@ -89,18 +148,18 @@ export const RoomCanvas: React.FC<RoomCanvasProps> = ({
 
               {/* Expanded Card Detail */}
               <AnimatePresence>
-                {isSelected && opinion && (
+                {isActive && opinion && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="mt-3 overflow-hidden border-t border-neutral-300/80 pt-3 text-xs text-neutral-800 space-y-2"
+                    className="mt-3.5 overflow-hidden border-t border-neutral-800 pt-3 text-xs space-y-2"
                   >
-                    <div className="rounded-lg bg-white/90 p-2.5 border border-neutral-200">
-                      <span className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider font-mono">
+                    <div className="rounded-lg bg-neutral-800/90 p-3 border border-neutral-700">
+                      <span className="block text-[10px] font-semibold text-neutral-400 uppercase tracking-wider font-mono">
                         Independent Blind Take
                       </span>
-                      <p className="mt-1 leading-relaxed text-neutral-800 font-sans">
+                      <p className="mt-1.5 leading-relaxed text-neutral-200 font-sans">
                         {opinion.take}
                       </p>
                     </div>
@@ -113,17 +172,18 @@ export const RoomCanvas: React.FC<RoomCanvasProps> = ({
       </div>
 
       {/* Central Dialectic Connector Banner */}
-      <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 p-4 text-center">
-        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-700">
-          <MessageSquare className="h-4 w-4 text-neutral-500" />
-          <span>Round 2 Cross-Examination Complete</span>
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-neutral-300 bg-neutral-50/60 p-4 text-center">
+        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-800 font-mono">
+          <MessageSquare className="h-4 w-4 text-neutral-700" />
+          <span>Round 2 Dialectic Cross-Examination Complete</span>
         </div>
-        <p className="mt-1 text-xs text-neutral-500 max-w-xl">
-          Personas independently evaluated your statement, challenged each other&apos;s blindspots, and generated the unified Perspective Brief below.
+        <p className="mt-1 text-xs text-neutral-500 max-w-xl font-sans">
+          Personas independently evaluated your statement, challenged each other&apos;s blindspots, and generated the synthesized Perspective Brief below.
         </p>
       </div>
     </div>
   );
 };
+
 
 

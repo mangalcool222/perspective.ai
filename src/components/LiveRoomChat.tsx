@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PersonaType, RoomChatMessage } from '@/types/perspective';
 import { PERSONAS } from '@/lib/constants';
 import { Send, AtSign, Loader2, MessageSquare, Bot } from 'lucide-react';
@@ -12,6 +12,36 @@ interface LiveRoomChatProps {
   onSendMessage: (message: string) => Promise<void>;
   isSending: boolean;
 }
+
+const TypewriterText: React.FC<{ text: string }> = ({ text }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    setDisplayedText('');
+    setIsTyping(true);
+    let index = 0;
+
+    const interval = setInterval(() => {
+      if (index < text.length) {
+        setDisplayedText((prev) => prev + text.charAt(index));
+        index++;
+      } else {
+        setIsTyping(false);
+        clearInterval(interval);
+      }
+    }, 15);
+
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return (
+    <p className="whitespace-pre-wrap font-sans">
+      {displayedText}
+      {isTyping && <span className="inline-block w-1.5 h-3.5 bg-neutral-900 ml-1 animate-pulse" />}
+    </p>
+  );
+};
 
 export const LiveRoomChat: React.FC<LiveRoomChatProps> = ({
   problemStatement,
@@ -72,9 +102,10 @@ export const LiveRoomChat: React.FC<LiveRoomChatProps> = ({
             </p>
           </div>
         ) : (
-          chatHistory.map((msg) => {
+          chatHistory.map((msg, index) => {
             const isUser = msg.sender === 'user';
             const personaInfo = !isUser ? PERSONAS[msg.sender] : null;
+            const isLatestAdvisorMsg = !isUser && index === chatHistory.length - 1;
 
             return (
               <motion.div
@@ -104,7 +135,11 @@ export const LiveRoomChat: React.FC<LiveRoomChatProps> = ({
                         : 'bg-white border border-neutral-200/90 text-neutral-800 rounded-bl-xs'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    {isLatestAdvisorMsg ? (
+                      <TypewriterText text={msg.content} />
+                    ) : (
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                    )}
                   </div>
                 </div>
 
@@ -173,5 +208,6 @@ export const LiveRoomChat: React.FC<LiveRoomChatProps> = ({
     </div>
   );
 };
+
 
 

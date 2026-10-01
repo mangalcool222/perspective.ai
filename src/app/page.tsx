@@ -213,11 +213,33 @@ function HomePageContent() {
             animate={{ opacity: 1, y: 0 }}
             className="mx-auto max-w-3xl space-y-8 text-center"
           >
+            {/* Live Advisor Pulse Bar */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {[
+                { name: 'Strategist 🧠', status: 'Positioning Leverage', color: 'bg-neutral-900 text-white' },
+                { name: 'Skeptic 🔴', status: 'Stress Testing Risks', color: 'bg-neutral-100 text-neutral-800 border-neutral-200' },
+                { name: 'Customer 👤', status: 'Switching Friction', color: 'bg-neutral-100 text-neutral-800 border-neutral-200' },
+                { name: 'Operator ⚙️', status: 'Execution Scaling', color: 'bg-neutral-100 text-neutral-800 border-neutral-200' },
+              ].map((advisor, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-mono border shadow-2xs ${advisor.color}`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-semibold">{advisor.name}</span>
+                  <span className="text-[10px] opacity-70 hidden sm:inline">• {advisor.status}</span>
+                </motion.div>
+              ))}
+            </div>
+
             {/* Hero Headline */}
             <div className="space-y-3">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600 shadow-2xs font-mono">
                 <Sparkles className="h-3.5 w-3.5 text-neutral-800" />
-                <span>Perspective.ai — Dialectic Decision Environment</span>
+                <span>Perspective.ai — Dialectic Executive Decision Engine</span>
               </div>
               <h1 className="font-serif text-3xl font-medium tracking-tight text-neutral-900 sm:text-5xl leading-tight">
                 Don&apos;t get answers. <br />
@@ -231,9 +253,21 @@ function HomePageContent() {
             {/* Input Card */}
             <div className="rounded-2xl border border-neutral-200/90 bg-white p-5 sm:p-6 shadow-xs text-left space-y-5">
               <div className="space-y-2">
-                <label htmlFor="problem-input" className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 font-mono">
-                  What decision or strategy are you trying to figure out?
-                </label>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="problem-input" className="block text-xs font-semibold uppercase tracking-wider text-neutral-600 font-mono">
+                    What decision or strategy are you trying to figure out?
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProblem("Should I launch UGhar with 3 services (AC, Plumbing, Cleaning) or start with AC repair only?");
+                      setSelectedMode('think');
+                    }}
+                    className="text-[11px] font-mono text-neutral-500 underline hover:text-neutral-900 cursor-pointer"
+                  >
+                    ⚡ Auto-Fill Demo
+                  </button>
+                </div>
                 <textarea
                   id="problem-input"
                   rows={3}
@@ -247,7 +281,7 @@ function HomePageContent() {
                 )}
               </div>
 
-              {/* Preset Examples */}
+              {/* Preset Examples (Auto-scrolling Marquee Ticker) */}
               <PresetExamples onSelect={handleSelectPreset} />
 
               {/* Room Mode Selector */}
@@ -262,15 +296,18 @@ function HomePageContent() {
               </div>
 
               {/* Primary Action Button */}
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={handleAssembleRoom}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-900 py-3.5 px-6 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 transition-all cursor-pointer group font-mono tracking-wide"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-neutral-900 py-3.5 px-6 text-sm font-medium text-white shadow-md hover:bg-neutral-800 transition-all cursor-pointer group font-mono tracking-wide"
               >
                 <span>⚡ ASSEMBLE THE ROOM</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </button>
+              </motion.button>
             </div>
           </motion.div>
+
         )}
 
         {/* Loading State */}
@@ -293,45 +330,40 @@ function HomePageContent() {
           >
             {/* Tab Bar & Share Action Toggle */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-neutral-200 pb-3">
-              <div className="flex flex-wrap items-center gap-1 rounded-xl bg-neutral-200/60 p-1 border border-neutral-200">
-                <button
-                  onClick={() => setActiveTab('brief')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                    activeTab === 'brief'
-                      ? 'bg-white text-neutral-900 shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  <FileText className="h-3.5 w-3.5 text-neutral-700" />
-                  <span>📋 Decision Brief</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('chat')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                    activeTab === 'chat'
-                      ? 'bg-white text-neutral-900 shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  <MessageSquare className="h-3.5 w-3.5 text-neutral-700" />
-                  <span>💬 Live Room Discussion (@Mentions)</span>
-                  {chatHistory.length > 0 && (
-                    <span className="rounded-full bg-neutral-900 px-1.5 py-0.2 text-[9px] text-white font-mono font-semibold">
-                      {chatHistory.length}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab('personas')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all cursor-pointer ${
-                    activeTab === 'personas'
-                      ? 'bg-white text-neutral-900 shadow-2xs'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  <Users className="h-3.5 w-3.5 text-neutral-700" />
-                  <span>🧠 Persona Room</span>
-                </button>
+              <div className="flex flex-wrap items-center gap-1 rounded-xl bg-neutral-200/60 p-1 border border-neutral-200 relative">
+                {[
+                  { id: 'brief', label: '📋 Decision Brief', icon: FileText },
+                  { id: 'chat', label: '💬 Live Discussion', count: chatHistory.length, icon: MessageSquare },
+                  { id: 'personas', label: '🧠 Persona Room', icon: Users },
+                ].map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
+
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`relative flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                        isActive ? 'text-neutral-900 font-semibold' : 'text-neutral-600 hover:text-neutral-900'
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeTabPill"
+                          className="absolute inset-0 rounded-lg bg-white shadow-2xs -z-10"
+                          transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+                        />
+                      )}
+                      <Icon className="h-3.5 w-3.5 text-neutral-700" />
+                      <span>{tab.label}</span>
+                      {tab.count !== undefined && tab.count > 0 && (
+                        <span className="rounded-full bg-neutral-900 px-1.5 py-0.2 text-[9px] text-white font-mono font-semibold">
+                          {tab.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="flex items-center gap-2">
@@ -345,35 +377,56 @@ function HomePageContent() {
               </div>
             </div>
 
-            {/* Tab 1: Clean Executive Decision Brief (Default) */}
-            {activeTab === 'brief' && (
-              <PerspectiveBriefView
-                brief={currentBrief}
-                onRunAnother={handleReset}
-                onInjectConstraint={handleInjectConstraint}
-                isInjecting={isInjecting}
-              />
-            )}
+            {/* View Transitions for Active Tab */}
+            <div className="mt-4">
+              {activeTab === 'brief' && (
+                <motion.div
+                  key="tab-brief"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <PerspectiveBriefView
+                    brief={currentBrief}
+                    onRunAnother={handleReset}
+                    onInjectConstraint={handleInjectConstraint}
+                    isInjecting={isInjecting}
+                  />
+                </motion.div>
+              )}
 
-            {/* Tab 2: Live Advisory Room Discussion Chat */}
-            {activeTab === 'chat' && (
-              <LiveRoomChat
-                problemStatement={currentBrief.problemStatement}
-                chatHistory={chatHistory}
-                onSendMessage={handleSendChatMessage}
-                isSending={isSendingChat}
-              />
-            )}
+              {activeTab === 'chat' && (
+                <motion.div
+                  key="tab-chat"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <LiveRoomChat
+                    problemStatement={currentBrief.problemStatement}
+                    chatHistory={chatHistory}
+                    onSendMessage={handleSendChatMessage}
+                    isSending={isSendingChat}
+                  />
+                </motion.div>
+              )}
 
-            {/* Tab 3: Persona Room Canvas (Raw Takes) */}
-            {activeTab === 'personas' && (
-              <div className="space-y-6">
-                <RoomCanvas
-                  opinions={currentBrief.personas}
-                  problemStatement={currentBrief.problemStatement}
-                />
-              </div>
-            )}
+              {activeTab === 'personas' && (
+                <motion.div
+                  key="tab-personas"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-6"
+                >
+                  <RoomCanvas
+                    opinions={currentBrief.personas}
+                    problemStatement={currentBrief.problemStatement}
+                  />
+                </motion.div>
+              )}
+            </div>
+
           </motion.div>
         )}
       </main>
